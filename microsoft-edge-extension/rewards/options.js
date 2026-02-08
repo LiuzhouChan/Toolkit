@@ -57,7 +57,6 @@ const DEFAULT_SEARCH_TERMS = [
 
 // DOM Elements
 const defaultNumSearchesInput = document.getElementById('defaultNumSearches');
-const defaultIntervalInput = document.getElementById('defaultInterval');
 const searchTermsTextarea = document.getElementById('searchTerms');
 const termCountSpan = document.getElementById('termCount');
 const saveBtn = document.getElementById('saveBtn');
@@ -82,10 +81,6 @@ async function loadSettings() {
   
   if (data.numSearches) {
     defaultNumSearchesInput.value = data.numSearches;
-  }
-  
-  if (data.interval) {
-    defaultIntervalInput.value = data.interval;
   }
   
   // Migrate old interval to new intervalMin/intervalMax
@@ -146,7 +141,6 @@ async function saveSettings() {
   try {
     await chrome.storage.sync.set({
       numSearches: parseInt(defaultNumSearchesInput.value),
-      interval: parseInt(defaultIntervalInput.value),
       intervalMin: parseInt(intervalMinInput.value),
       intervalMax: parseInt(intervalMaxInput.value),
       searchTerms: searchTerms,
@@ -170,7 +164,6 @@ async function resetToDefaults() {
   }
   
   defaultNumSearchesInput.value = 30;
-  defaultIntervalInput.value = 3;
   intervalMinInput.value = 5;
   intervalMaxInput.value = 10;
   searchTermsTextarea.value = DEFAULT_SEARCH_TERMS.join('\n');
