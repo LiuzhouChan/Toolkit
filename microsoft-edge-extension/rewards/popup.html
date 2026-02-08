@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bing Rewards Search Helper</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Bing Rewards Search</h1>
+    
+    <div class="stats">
+      <span id="searchCount">0</span> / <span id="totalSearches">30</span> searches
+    </div>
+    
+    <div class="controls">
+      <div class="input-group">
+        <label for="numSearches">Number of searches:</label>
+        <input type="number" id="numSearches" min="1" max="50" value="30">
+      </div>
+      
+      <div class="input-group">
+        <label for="interval">Interval (seconds):</label>
+        <input type="number" id="interval" min="1" max="60" value="3">
+      </div>
+    </div>
+    
+    <div class="buttons">
+      <button id="startBtn" class="btn btn-primary">Start Searches</button>
+      <button id="stopBtn" class="btn btn-danger" disabled>Stop</button>
+    </div>
+    
+    <div class="status" id="status"></div>
+    
+    <div class="footer">
+      <a href="#" id="optionsLink">Settings</a>
+      <span class="separator">|</span>
+      <span class="version">v1.0.0</span>
+    </div>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>

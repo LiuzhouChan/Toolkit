@@ -23,6 +23,19 @@ Prevents Bluetooth speakers from auto-disconnecting by playing a quiet tone ever
 
 [📖 View detailed documentation](./keep-speaker-alive/README.md)
 
+### [`microsoft-edge-extension/rewards/`](./microsoft-edge-extension/rewards)
+
+Microsoft Edge extension that helps complete Microsoft Rewards daily search tasks.
+
+**Features:**
+- Automatically opens Bing searches in new tabs
+- Customizable search count and interval
+- Custom search terms with category presets
+- Settings sync across devices
+- Modern Fluent Design UI
+
+[📖 View detailed documentation](./microsoft-edge-extension/rewards/README.md)
+
 ## 🤖 Installing Tools with AI Agents
 
 Each tool folder contains a README with specific installation instructions. To install any tool using an AI agent (like OpenCode, GitHub Copilot, etc.), use this pattern:

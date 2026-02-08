@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bing Rewards Search Helper - Settings</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Bing Rewards Search Helper Settings</h1>
+    
+    <div class="section">
+      <h2>Default Search Settings</h2>
+      <div class="form-group">
+        <label for="defaultNumSearches">Default number of searches:</label>
+        <input type="number" id="defaultNumSearches" min="1" max="50" value="30">
+      </div>
+      <div class="form-group">
+        <label for="defaultInterval">Default interval (seconds):</label>
+        <input type="number" id="defaultInterval" min="1" max="60" value="3">
+      </div>
+    </div>
+    
+    <div class="section">
+      <h2>Custom Search Terms</h2>
+      <p class="description">
+        Enter your custom search terms, one per line. These will be used instead of the default terms.
+        Leave empty to use default search terms.
+      </p>
+      <textarea id="searchTerms" rows="15" placeholder="Enter search terms, one per line..."></textarea>
+      <div class="term-count">
+        <span id="termCount">0</span> search terms
+      </div>
+    </div>
+    
+    <div class="section">
+      <h2>Quick Add</h2>
+      <p class="description">Quickly add predefined search term categories:</p>
+      <div class="quick-add-buttons">
+        <button class="btn btn-secondary" data-category="tech">Technology</button>
+        <button class="btn btn-secondary" data-category="entertainment">Entertainment</button>
+        <button class="btn btn-secondary" data-category="sports">Sports</button>
+        <button class="btn btn-secondary" data-category="food">Food & Cooking</button>
+        <button class="btn btn-secondary" data-category="travel">Travel</button>
+        <button class="btn btn-secondary" data-category="health">Health & Fitness</button>
+      </div>
+    </div>
+    
+    <div class="buttons">
+      <button id="saveBtn" class="btn btn-primary">Save Settings</button>
+      <button id="resetBtn" class="btn btn-danger">Reset to Defaults</button>
+    </div>
+    
+    <div id="saveStatus" class="save-status"></div>
+  </div>
+  
+  <script src="options.js"></script>
+</body>
+</html>
