@@ -20,6 +20,13 @@ let searchTerms = [...DEFAULT_SEARCH_TERMS];
 let isSearching = false;
 let searchTimeout = null;
 let currentSearchIndex = 0;
+let intervalMin = 5;
+let intervalMax = 10;
+let requiredTerms = [];
+let enableVocabulary = false;
+let vocabSearchFormat = 'define';
+let vocabularyList = [];
+let searchQueue = [];
 
 // DOM Elements
 const startBtn = document.getElementById('startBtn');
@@ -30,10 +37,15 @@ const searchCountSpan = document.getElementById('searchCount');
 const totalSearchesSpan = document.getElementById('totalSearches');
 const statusDiv = document.getElementById('status');
 const optionsLink = document.getElementById('optionsLink');
+const intervalMinDisplay = document.getElementById('intervalMinDisplay');
+const intervalMaxDisplay = document.getElementById('intervalMaxDisplay');
 
 // Load settings
 async function loadSettings() {
-  const data = await chrome.storage.sync.get(['searchTerms', 'numSearches', 'interval']);
+  const data = await chrome.storage.sync.get([
+    'searchTerms', 'numSearches', 'intervalMin', 'intervalMax',
+    'requiredTerms', 'enableVocabulary', 'vocabSearchFormat', 'vocabularyList'
+  ]);
   
   if (data.searchTerms && data.searchTerms.length > 0) {
     searchTerms = data.searchTerms;
@@ -43,8 +55,33 @@ async function loadSettings() {
     numSearchesInput.value = data.numSearches;
   }
   
-  if (data.interval) {
-    intervalInput.value = data.interval;
+  // Load interval range
+  if (data.intervalMin !== undefined) {
+    intervalMin = data.intervalMin;
+    intervalMinDisplay.textContent = intervalMin;
+  }
+  
+  if (data.intervalMax !== undefined) {
+    intervalMax = data.intervalMax;
+    intervalMaxDisplay.textContent = intervalMax;
+  }
+  
+  // Load required terms
+  if (data.requiredTerms && data.requiredTerms.length > 0) {
+    requiredTerms = data.requiredTerms;
+  }
+  
+  // Load vocabulary settings
+  if (data.enableVocabulary !== undefined) {
+    enableVocabulary = data.enableVocabulary;
+  }
+  
+  if (data.vocabSearchFormat) {
+    vocabSearchFormat = data.vocabSearchFormat;
+  }
+  
+  if (data.vocabularyList && data.vocabularyList.length > 0) {
+    vocabularyList = data.vocabularyList;
   }
   
   totalSearchesSpan.textContent = numSearchesInput.value;
@@ -53,8 +90,7 @@ async function loadSettings() {
 // Save settings
 async function saveSettings() {
   await chrome.storage.sync.set({
-    numSearches: parseInt(numSearchesInput.value),
-    interval: parseInt(intervalInput.value)
+    numSearches: parseInt(numSearchesInput.value)
   });
 }
 
@@ -67,9 +103,66 @@ function getRandomSearchTerm() {
   return term + randomSuffix;
 }
 
+// Get random interval in milliseconds
+function getRandomInterval(min, max) {
+  return Math.floor(Math.random() * (max - min + 1) + min) * 1000;
+}
+
+// Shuffle array in place
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+// Format vocabulary search
+function formatVocabSearch(word) {
+  switch (vocabSearchFormat) {
+    case 'define': return `define ${word}`;
+    case 'meaning': return `${word} meaning`;
+    case 'definition': return `${word} definition`;
+    case 'whatis': return `what is ${word}`;
+    default: return `define ${word}`;
+  }
+}
+
+// Build search queue with priority
+function buildSearchQueue(totalSearches) {
+  const queue = [];
+  
+  // 1. Add required terms first (up to totalSearches)
+  const requiredCount = Math.min(requiredTerms.length, totalSearches);
+  for (let i = 0; i < requiredCount; i++) {
+    queue.push(requiredTerms[i]);
+  }
+  
+  // 2. Calculate remaining slots
+  const remaining = totalSearches - queue.length;
+  
+  if (remaining > 0) {
+    // 3. Build pool of random terms (including vocabulary if enabled)
+    let randomPool = [...searchTerms];
+    
+    if (enableVocabulary && vocabularyList.length > 0) {
+      const vocabSearches = vocabularyList.map(word => formatVocabSearch(word));
+      randomPool = [...randomPool, ...vocabSearches];
+    }
+    
+    // 4. Shuffle and pick random terms to fill remaining slots
+    shuffleArray(randomPool);
+    for (let i = 0; i < remaining; i++) {
+      queue.push(randomPool[i % randomPool.length]);
+    }
+  }
+  
+  return queue;
+}
+
 // Perform a single search
 async function performSearch() {
-  const searchTerm = getRandomSearchTerm();
+  const searchTerm = searchQueue[currentSearchIndex] || getRandomSearchTerm(); // Fallback to random
   const encodedTerm = encodeURIComponent(searchTerm);
   const url = `https://www.bing.com/search?q=${encodedTerm}`;
   
@@ -100,6 +193,10 @@ function startSearching() {
   searchCountSpan.textContent = '0';
   totalSearchesSpan.textContent = numSearchesInput.value;
   
+  // Build search queue with priority
+  const totalSearches = parseInt(numSearchesInput.value);
+  searchQueue = buildSearchQueue(totalSearches);
+  
   startBtn.disabled = true;
   stopBtn.disabled = false;
   numSearchesInput.disabled = true;
@@ -111,20 +208,19 @@ function startSearching() {
   // Perform first search immediately
   performSearch();
   
-  // Set up interval for remaining searches
-  const intervalMs = parseInt(intervalInput.value) * 1000;
-  const totalSearches = parseInt(numSearchesInput.value);
-  
-  function scheduleNextSearch() {
-    if (!isSearching || currentSearchIndex >= totalSearches) return;
-    
-    searchTimeout = setTimeout(() => {
-      performSearch();
-      scheduleNextSearch();
-    }, intervalMs);
-  }
-  
+  // Schedule remaining searches
   scheduleNextSearch();
+}
+
+// Schedule next search
+function scheduleNextSearch() {
+  if (!isSearching || currentSearchIndex >= parseInt(numSearchesInput.value)) return;
+  
+  const intervalMs = getRandomInterval(intervalMin, intervalMax);
+  searchTimeout = setTimeout(() => {
+    performSearch();
+    scheduleNextSearch();
+  }, intervalMs);
 }
 
 // Stop searching

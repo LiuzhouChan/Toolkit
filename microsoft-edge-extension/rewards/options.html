@@ -17,8 +17,54 @@
         <input type="number" id="defaultNumSearches" min="1" max="50" value="30">
       </div>
       <div class="form-group">
-        <label for="defaultInterval">Default interval (seconds):</label>
-        <input type="number" id="defaultInterval" min="1" max="60" value="3">
+        <label>Random interval range (seconds):</label>
+        <div class="range-inputs">
+          <input type="number" id="intervalMin" min="1" max="60" value="5" class="range-input">
+          <span class="range-separator">to</span>
+          <input type="number" id="intervalMax" min="1" max="120" value="10" class="range-input">
+        </div>
+        <p class="hint">Each search will wait a random time within this range</p>
+      </div>
+    </div>
+    
+    <div class="section">
+      <h2>Required Search Terms</h2>
+      <p class="description">
+        These terms will ALWAYS be searched first, before random terms. 
+        If you have more required terms than the search count, only the first N will be used.
+        Enter one term per line.
+      </p>
+      <textarea id="requiredTerms" rows="8" placeholder="Enter required search terms, one per line...&#10;Example:&#10;what is machine learning&#10;how to learn python&#10;best programming practices"></textarea>
+      <div class="term-count">
+        <span id="requiredTermCount">0</span> required terms
+      </div>
+    </div>
+    
+    <div class="section">
+      <h2>Vocabulary Learning</h2>
+      <p class="description">
+        Add words you want to learn. The extension will search for their definitions randomly.
+        Enable the toggle to include vocabulary searches in your daily searches.
+      </p>
+      <div class="form-group toggle-group">
+        <label for="enableVocabulary">Enable vocabulary learning:</label>
+        <label class="toggle">
+          <input type="checkbox" id="enableVocabulary">
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="form-group">
+        <label for="vocabSearchFormat">Search format:</label>
+        <select id="vocabSearchFormat">
+          <option value="define">define [word]</option>
+          <option value="meaning">[word] meaning</option>
+          <option value="definition">[word] definition</option>
+          <option value="whatis">what is [word]</option>
+        </select>
+      </div>
+      <textarea id="vocabularyList" rows="8" placeholder="Enter words to learn, one per line...&#10;Example:&#10;ephemeral&#10;ubiquitous&#10;pragmatic"></textarea>
+      <div class="term-count">
+        <span id="vocabCount">0</span> vocabulary words
       </div>
     </div>
     
